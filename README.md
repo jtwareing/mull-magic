@@ -1,4 +1,4 @@
-# Mullaney's Kitchen
+# Mull Magic
 
 A fan-run quiz site for the Steven Mullaney faithful.
 
