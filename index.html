@@ -526,7 +526,7 @@ function genMatePos(ms,s){const by=new Map();ms.forEach(m=>Object.entries(m.tp).
   const cands=[...by.entries()].filter(([p,a])=>a.length>=(s==="all"?15:3)).map(([p,a])=>{const r=tally(a.map(x=>[x.pos]));return{p,a,pos:+r[0][0],share:r[0][1]/a.length}}).filter(x=>x.share>=.6);
   if(!cands.length)return null;const c=rnd(cands);
   const opts=[...new Set([c.pos,...shuffle([1,2,3,4,5,6,7,8,9,10,11].filter(x=>Math.abs(x-c.pos)<=4&&x!==c.pos)).slice(0,3)])].sort((a,b)=>a-b);if(opts.length<4)return null;
-  return{opts:opts.map(x=>"No."+x),a:opts.indexOf(c.pos),q:`Where did ${name(c.p)} usually bat when playing alongside Mullaney ${inSzn(s)}?`,ctx:`${name(c.p)} batted at No.${c.pos} in ${Math.round(c.share*c.a.length)} of their ${c.a.length} matches together.`,m:c.a[0].m}}
+  return{opts:opts.map(x=>"No."+x),a:opts.indexOf(c.pos),q:`Where did ${name(c.p)} usually bat when playing alongside Mullaney ${inSzn(s)}?`,ctx:`${name(c.p)} batted at No.${c.pos} in ${Math.round(c.share*c.a.length)} of his ${c.a.length} matches with Mullaney.`,m:c.a[0].m}}
 /* Where was a victim batting (specific dismissal) */
 function genPos(ms){const m=rnd(ms.filter(x=>x.wk.some(w=>w[2])));if(!m)return null;const w=rnd(m.wk.filter(w=>w[2]));
   const opts=[...new Set([w[2],...shuffle([1,2,3,4,5,6,7,8,9,10,11].filter(x=>Math.abs(x-w[2])<=4&&x!==w[2])).slice(0,3)])].sort((a,b)=>a-b);if(opts.length<4)return null;
@@ -737,7 +737,7 @@ async function renderDegrees(){
     try{await loadNet()}catch(e){box.innerHTML=`<p class="note">Couldn't load the network data. Check your connection and open this tab again.</p>`;return}}
   box.innerHTML=`
    <div class="sec-head"><h2>Six Degrees of Mullaney #${dayNo(londonDate())}</h2><span class="qprog">New starting player at midnight (UK)</span></div>
-   <p class="note">Everyone gets the same starting cricketer today. Get from them to Steven Mullaney through players who shared an XI. Each name you add must have played in the same team, in the same match, as the one before. Finish by naming Mullaney himself. Matching the shortest possible chain is <b>Rockets Speed</b>; <b>par</b> is two more than that.</p>
+   <p class="note">Everyone gets the same starting cricketer today. Get from him to Steven Mullaney through players who shared an XI. Each name you add must have played in the same team, in the same match, as the one before. Finish by naming Mullaney himself. Matching the shortest possible chain is <b>Rockets Speed</b>; <b>par</b> is two more than that.</p>
    <div id="sixgame"></div>
    <section class="panel"><h2>Look up any player</h2><p class="sub2">Find anyone's Mullaney number and the shortest chain.</p>
      <div class="entry sugg-wrap"><input id="dsearch" autocomplete="off" spellcheck="false" placeholder="e.g. Virat Kohli" aria-label="Search for a cricketer"><ul class="sugg" id="dsugg" hidden role="listbox"></ul></div>
@@ -815,7 +815,7 @@ function drawLink(){const L=LINK,box=$("#missing");
   let ptsHTML="";
   if(L.done){const a=award("link:"+L.date,L.gaveUp?0:Math.max(1,5-L.wides));ptsHTML=L.gaveUp?duckHTML(`The Missing Link #${dayNo(L.date)}`,"Copy result for the group chat"):`<div class="result-mini">${ptsLine(a)}</div>`}
   box.innerHTML=`<div class="sec-head"><h2>The Missing Link #${dayNo(L.date)}</h2><span class="qprog">New player at midnight (UK)</span></div>
-   <p class="note">Today's cricketer never played with Mullaney, but they shared an XI with at least one of his teammates. Name a Mullaney teammate who played alongside them. 5 points for a correct answer, minus 1 for each wide.</p>
+   <p class="note">Today's cricketer never played with Mullaney, but he shared an XI with at least one of his teammates. Name a Mullaney teammate who played alongside him. 5 points for a correct answer, minus 1 for each wide.</p>
    <section class="panel"><div class="sixtop"><div><div class="lbl2">Mystery link to</div><div class="target">${esc(nName(L.t))}</div><div class="sub2">${esc(recentTeams(L.t).join(" · "))}</div></div>
      <div class="scorebox"><div><div class="big">${L.links.length}</div><small>possible links</small></div><div><div class="big">${L.wides}</div><small>wides</small></div></div></div>
     ${L.done?"":`<div class="entry sugg-wrap"><input id="lguess" autocomplete="off" spellcheck="false" placeholder="A Mullaney teammate…" aria-label="Name the missing link"><ul class="sugg" id="lsugg" hidden role="listbox"></ul><button class="btn ghost" id="lgive">Show me</button></div>`}
@@ -862,7 +862,7 @@ function renderAvg(){const box=$("#avgame"),M=AV.mullaney;
       ${q.mullBetter?`<img src="img/${q.kind==="bat"?"res-hundred.png":"tb-celeb.jpg"}" alt="Mullaney celebrating">`:""}
       <div><div class="lbl2">${right?"Correct":"Wrong"} · ball ${i}</div>
       <p><b>${esc(q.p.name)}</b>: ${esc(fig(q))}${q.p.date?` (as of ${esc(q.p.date)})`:""}.</p>
-      <p>${q.mullBetter?`<b>Mullaney's better.</b> ${q.kind==="bat"?"Get the bat up, skipper.":"Cleverer with the ball than they look."}`:`${esc(q.p.name.split(" ").pop())} has the better ${q.kind==="bat"?"batting":"bowling"} average.`}</p></div></div>`}
+      <p>${q.mullBetter?`<b>Mullaney's better; in this and every way.</b>`:`${esc(q.p.name.split(" ").pop())} has the better ${q.kind==="bat"?"batting":"bowling"} average.`}</p></div></div>`}
   const pips=qs.map((q,k)=>`<span class="ballpip ${k<i?(st.a[k]===!q.mullBetter?"y":"n"):""}"></span>`).join("");
   box.innerHTML=`<div class="sec-head"><h2>Better Than Mull? #${dayNo(d)}</h2><span class="qprog">Ten new players at midnight (UK)</span></div>
    <p class="note">Is each player's first-class career average better or worse than Steven Mullaney's? Higher is better for batting, lower is better for bowling. Figures come from each player's Wikipedia profile (sourced from Cricinfo), as at the date shown.</p>
@@ -870,7 +870,7 @@ function renderAvg(){const box=$("#avgame"),M=AV.mullaney;
    <section class="panel">
     <div class="qprog">${pips}</div>
     ${last}
-    ${done?`<div id="avres"></div>`:`<div class="q">${esc(qs[i].p.name)}${team(qs[i])?` <span class="sub2">(${esc(team(qs[i]))})</span>`:""}: is their first-class <b>${qs[i].kind==="bat"?"batting":"bowling"}</b> average better or worse than Mullaney's ${(qs[i].kind==="bat"?M.bat:M.bowl).toFixed(2)}?</div>
+    ${done?`<div id="avres"></div>`:`<div class="q">${esc(qs[i].p.name)}${team(qs[i])?` <span class="sub2">(${esc(team(qs[i]))})</span>`:""}: is his first-class <b>${qs[i].kind==="bat"?"batting":"bowling"}</b> average better or worse than Mullaney's ${(qs[i].kind==="bat"?M.bat:M.bowl).toFixed(2)}?</div>
      <div class="opts"><button class="opt" id="avbetter">Better than Mullaney</button><button class="opt" id="avworse">Worse than Mullaney</button></div>`}
    </section>`;
   if(!done){const ans=v=>{st.a.push(v);all[d]=st;store.set("avg_daily",all);renderAvg()};
