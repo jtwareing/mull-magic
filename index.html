@@ -90,6 +90,12 @@ h1 .hl{color:var(--gold)}
 .sixchain li span{font-size:13px;color:var(--muted)}
 .sixpanel .actions{margin-top:12px}
 #degrees>.panel{margin-top:20px}
+.sixrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.sixrow .entry{flex:1 1 320px;margin:12px 0}
+.mullbtn{display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;cursor:pointer;color:var(--green);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.mullbtn img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:4px solid var(--gold);box-shadow:0 0 0 3px var(--green),var(--shadow);transition:transform .15s}
+.mullbtn:hover img,.mullbtn:focus-visible img{transform:scale(1.08)}
+.mullbtn:active img{transform:scale(.95)}
 .links{padding-left:18px;font-size:14px;display:grid;gap:4px}
 .links li.hit{color:var(--good);font-weight:600}
 /* Better Than Mull? */
@@ -300,7 +306,7 @@ footer{margin-block:40px 32px;padding-top:16px;border-top:1px solid var(--line);
   <div class="lightbox" id="certbox" hidden role="dialog" aria-modal="true" aria-label="Certificate"></div>
 
   <footer>
-    <div>Match data: <a href="https://cricsheet.org" target="_blank" rel="noopener">Cricsheet</a>, 2014 to 2023 (County Championship, Bob Willis Trophy, One-Day Cup, T20 Blast, The Hundred). Each answer links to its Cricinfo scorecard. Career milestones link to their sources.</div>
+    <div>Match data: <a href="https://cricsheet.org" target="_blank" rel="noopener">Cricsheet</a>, 2014 to 2023 (County Championship, Bob Willis Trophy, One-Day Cup, T20 Blast, The Hundred).</div>
     <div>Before 2014 is not covered by the match quizzes yet. Affectionate parody by fans; not affiliated with Steven Mullaney or Nottinghamshire CCC.</div>
   </footer>
 </div>
@@ -743,7 +749,7 @@ async function renderDegrees(){
     try{await loadNet()}catch(e){box.innerHTML=`<p class="note">Couldn't load the network data. Check your connection and open this tab again.</p>`;return}}
   box.innerHTML=`
    <div class="sec-head"><h2>Six Degrees of Mullaney #${dayNo(londonDate())}</h2><span class="qprog">New starting player at midnight (UK)</span></div>
-   <p class="note">Everyone gets the same starting cricketer today. Get from him to Steven Mullaney through players who shared an XI. Each name you add must have played in the same team, in the same match, as the one before. Finish by naming Mullaney himself. Matching the shortest possible chain is <b>Rockets Speed</b>; <b>par</b> is two more than that.</p>
+   <p class="note">Everyone gets the same starting cricketer today. Get from him to Steven Mullaney through players who shared an XI. Each name you add must have played in the same team, in the same match, as the one before. Once you reach one of his teammates, press the Mullaney button to finish. Matching the shortest possible chain is <b>Rockets Speed</b>; <b>par</b> is two more than that.</p>
    <div id="sixgame"></div>
    <section class="panel"><h2>Look up any player</h2><p class="sub2">Find anyone's Mullaney number and the shortest chain.</p>
      <div class="entry sugg-wrap"><input id="dsearch" autocomplete="off" spellcheck="false" placeholder="e.g. Virat Kohli" aria-label="Search for a cricketer"><ul class="sugg" id="dsugg" hidden role="listbox"></ul></div>
@@ -760,8 +766,9 @@ function drawSix(){const G=SIX,box=$("#sixgame");const n=G.steps.length;
      <div class="scorebox"><div><div class="big">${n}</div><small>steps</small></div><div><div class="big">${G.min}</div><small>Rockets Speed</small></div><div><div class="big">${G.par}</div><small>par</small></div><div><div class="big">${G.wides}</div><small>wides</small></div></div></div>
     ${chainHTML}
     ${G.done?"":`<p class="q">Who played in the same XI as <b>${esc(nName(G.cur))}</b>?</p>
-     <div class="entry sugg-wrap"><input id="sixin" autocomplete="off" spellcheck="false" placeholder="Type a cricketer…" aria-label="Next player in the chain"><ul class="sugg" id="sixsugg" hidden role="listbox"></ul>
+     <div class="sixrow"><div class="entry sugg-wrap"><input id="sixin" autocomplete="off" spellcheck="false" placeholder="Type a cricketer…" aria-label="Next player in the chain"><ul class="sugg" id="sixsugg" hidden role="listbox"></ul>
      ${n?`<button class="btn ghost" id="sixundo">Undo</button>`:""}<button class="btn ghost" id="sixgive">Show me</button></div>
+     <button class="mullbtn" id="sixmull" title="Link ${esc(nName(G.cur))} to Mullaney"><img src="img/mull-face.jpg" alt=""><span>Mullaney</span></button></div>
      ${G.review!=null?`<button class="btn gold" id="sixreview">📺 Third umpire review</button>`:""}`}
     <div class="flash" id="sixmsg">${esc(G.msg)}</div>
     <div id="sixres"></div>
@@ -772,16 +779,17 @@ function drawSix(){const G=SIX,box=$("#sixgame");const n=G.steps.length;
     G.steps.push({from:G.cur,to:p,s:-1});G.cur=p;G.done=true;G.msg=`Third umpire: given! ${nName(G.steps[G.steps.length-1].from)} and Mullaney were ${clubTxt(G.steps[G.steps.length-1].from)}. ${REVIEW_NOTE}`;saveSix();drawSix()};
   if(n)$("#sixundo").onclick=()=>{const st=G.steps.pop();G.cur=st.from;G.msg="Step taken back.";saveSix();drawSix()};
   const all=NET.players.map((p,i)=>i);
-  suggestBox($("#sixin"),$("#sixsugg"),q=>matchNames(q,all,nName,8,i=>NET.dist[i]).map(i=>({label:nName(i),sub:recentTeams(i,1)[0]||"",i})),it=>{
-    const p=it.i;G.review=null;
+  const linkTo=p=>{G.review=null;
     if(p===G.cur||p===G.start||G.steps.some(st=>st.to===p)){G.msg=`${nName(p)} is already in your chain.`;drawSix();return}
     const s=sharedSheet(G.cur,p);
     if(s<0&&p===NET.M&&CLUBM.has(G.cur)){G.review=p;G.msg=`Not on our scorecards (2014 onwards). ${nName(G.cur)} was at ${CLUBM.get(G.cur).club} with Mullaney. Send it upstairs?`;drawSix();return}
-    if(s<0){G.wides++;G.msg=`Wide! ${nName(p)} never shared an XI with ${nName(G.cur)}.`;saveSix();drawSix();const i=$("#sixin");if(i)i.focus();return}
+    if(s<0){G.wides++;G.msg=p===NET.M?`Wide! ${nName(G.cur)} never shared an XI with Mullaney. Find one of his teammates first.`:`Wide! ${nName(p)} never shared an XI with ${nName(G.cur)}.`;saveSix();drawSix();const i=$("#sixin");if(i)i.focus();return}
     G.steps.push({from:G.cur,to:p,s});G.cur=p;
     if(p===NET.M){G.done=true;G.msg="";saveSix();drawSix();return}
     saveSix();
-    G.msg=`Good link. ${nName(p)} is ${NET.dist[p]} step${NET.dist[p]===1?"":"s"} from Mullaney.`;drawSix();const i=$("#sixin");if(i)i.focus()});
+    G.msg=`Good link. ${nName(p)} is ${NET.dist[p]} step${NET.dist[p]===1?"":"s"} from Mullaney.`+(NET.dist[p]===1?" Press the Mullaney button to finish.":"");drawSix();const i=$("#sixin");if(i)i.focus()};
+  suggestBox($("#sixin"),$("#sixsugg"),q=>matchNames(q,all,nName,8,i=>NET.dist[i]).map(i=>({label:nName(i),sub:recentTeams(i,1)[0]||"",i})),it=>linkTo(it.i));
+  $("#sixmull").onclick=()=>linkTo(NET.M);
   $("#sixin").focus({preventScroll:true});
 }
 function finishSix(){const G=SIX,n=G.steps.length,host=$("#sixres");
@@ -837,7 +845,7 @@ function drawLink(){const L=LINK,box=$("#missing");
    </section>`;
   if(L.done){if(L.gaveUp){$("#lshare").remove();const ag=$("#missing .resagain");ag.onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: out for a duck 🦆
 ${SITE_URL}`,ag);return}
-  $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)} ${L.gaveUp?"❌":"✅"}${L.wides?` (${L.wides} wide${L.wides===1?"":"s"})`:""} 🏏\n${SITE_URL}`,$("#lshare"));return}
+  $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)} ${L.gaveUp?"❌":"✅"} (${L.wides} wide${L.wides===1?"":"s"}) 🏏\n${SITE_URL}`,$("#lshare"));return}
   $("#lgive").onclick=()=>{L.done=true;L.gaveUp=true;L.msg="";saveLink();drawLink()};
   const ones=NET.players.map((p,i)=>i).filter(i=>NET.dist[i]===1||CLUBM.has(i));
   if(L.review!=null)$("#lreview").onclick=()=>{const c=L.review;L.review=null;const s=sharedSheet(c,L.t);
