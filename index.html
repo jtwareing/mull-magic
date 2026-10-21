@@ -412,20 +412,20 @@ const BANDS=[[75,"res-hundred.png","Bat raised to the dressing room. That's a hu
              [25,"res-young.png","Still a young pro. Back to the nets.","A young Mullaney in a Notts headshot"],
              [0,"res-stern.png","The skipper is not impressed.","Mullaney looking stern in a Notts cap"]];
 function duckHTML(label,again){
-  return `<div class="result" id="result" tabindex="-1"><img src="img/res-stern.png" alt="Mullaney looking stern">
+  return `<div class="result" tabindex="-1"><img src="img/res-stern.png" alt="Mullaney looking stern">
    <div><div class="lbl">${esc(label)}</div><div class="score duck">Out for a duck</div>
    <div class="verdict">The skipper is not impressed.</div><div class="ptsline">No career points today</div>
-   <div class="actions"><button class="btn" id="resagain">${esc(again)}</button></div></div></div>`}
+   <div class="actions"><button class="btn resagain">${esc(again)}</button></div></div></div>`}
 function resultHTML(score,total,again){
   const pct=total?Math.round(score/total*100):0; const b=BANDS.find(x=>pct>=x[0]);
-  return `<div class="result" id="result" tabindex="-1"><img src="img/${b[1]}" alt="${esc(b[3])}">
+  return `<div class="result" tabindex="-1"><img src="img/${b[1]}" alt="${esc(b[3])}">
    <div><div class="lbl">Final score</div><div class="score">${score}/${total}</div><div class="pct">${pct}%</div>
    <div class="verdict">${esc(b[2])}</div>
-   <div class="actions"><button class="btn" id="resagain">${esc(again)}</button><button class="btn ghost" id="respick">Choose another quiz</button></div></div></div>`}
+   <div class="actions"><button class="btn resagain">${esc(again)}</button><button class="btn ghost respick">Choose another quiz</button></div></div></div>`}
 function showResult(host,score,total,again,onAgain){
   host.insertAdjacentHTML("afterbegin",resultHTML(score,total,again));
-  const r=$("#result");r.scrollIntoView({behavior:"smooth",block:"start"});r.focus({preventScroll:true});
-  $("#resagain").onclick=onAgain;$("#respick").onclick=()=>{$("#play").innerHTML="";$("#cards").scrollIntoView({behavior:"smooth",block:"start"})};
+  const r=host.querySelector(".result");r.scrollIntoView({behavior:"smooth",block:"start"});r.focus({preventScroll:true});
+  r.querySelector(".resagain").onclick=onAgain;r.querySelector(".respick").onclick=()=>{$("#play").innerHTML="";$("#cards").scrollIntoView({behavior:"smooth",block:"start"})};
 }
 
 /* list quiz */
@@ -479,7 +479,7 @@ function start(key){
     items.forEach(it=>{if(!it.got)it.missed=true});draw();
     $("#flash").innerHTML=`${esc(msg)} Missed names are in red; each name links to its scorecard.`;
     record(qkey(q,s),found);
-    const old=$("#result");if(old)old.remove();
+    const old=document.querySelector("#play .result");if(old)old.remove();
     showResult(document.querySelector("#play .panel"),found,items.length,"Play again",()=>start(key))}
 }
 
@@ -676,18 +676,18 @@ function renderMulldle(){
    <p class="qprog">Played ${stats.played} · Won ${stats.won} · Current streak ${stats.streak} · Best streak ${stats.max}</p>`;
   if(over){const share=mulldleShare(d,today.g,ans);
     $("#mresult").innerHTML=resultHTML(won?MAXG-today.g.length+1:0,MAXG,"Copy result for the group chat").replace("Final score",`Mulldle #${dayNo(d)}`);
-    const r=$("#result");r.querySelector(".score").textContent=won?`${today.g.length}/${MAXG}`:`X/${MAXG}`;
+    const r=$("#mresult .result");r.querySelector(".score").textContent=won?`${today.g.length}/${MAXG}`:`X/${MAXG}`;
     const aw=award("mulldle:"+d,won?[10,8,6,5,4,3][today.g.length-1]:1);r.querySelector(".verdict").insertAdjacentHTML("afterend",ptsLine(aw));
     r.querySelector(".pct").textContent=won?`Solved in ${today.g.length} guess${today.g.length===1?"":"es"}`:"Not this time. New player tomorrow.";
     const im=r.querySelector("img");im.className="player";im.alt=name(ans);
     im.onerror=()=>{const d=document.createElement("div");d.className="initials";d.textContent=name(ans).split(" ").map(w=>w[0]).join("").slice(0,3);d.setAttribute("aria-label",name(ans));im.replaceWith(d)};
     im.src=`img/players/${PL[ans][2]}.jpg`;
     const cap=document.createElement("div");cap.className="anscap";cap.textContent=name(ans);r.querySelector(".lbl").after(cap);
-    $("#resagain").onclick=()=>copyText(share,$("#resagain"));$("#respick").textContent="Back to the quizzes";
-    $("#respick").onclick=()=>document.querySelector('[data-tab="middle"]').click();
+    const ag=r.querySelector(".resagain"),pk=r.querySelector(".respick");ag.onclick=()=>copyText(share,ag);pk.textContent="Back to the quizzes";
+    pk.onclick=()=>document.querySelector('[data-tab="middle"]').click();
     return}
   const inp=$("#mguess");
-  suggestBox(inp,$("#msugg"),q=>matchNames(q,MATES.filter(o=>!today.g.includes(o.p)),o=>name(o.p)).map(o=>({label:name(o.p),sub:`${o.first}–${o.last}`,p:o.p})),it=>{
+  suggestBox(inp,$("#msugg"),q=>matchNames(q,MATES.filter(o=>!today.g.includes(o.p)),o=>name(o.p)).map(o=>({label:name(o.p),p:o.p})),it=>{
     today.g.push(it.p);st[d]=today;
     if(it.p===ans||today.g.length>=MAXG){stats.played++;if(it.p===ans){stats.won++;stats.streak++;stats.max=Math.max(stats.max,stats.streak)}else stats.streak=0;store.set("mulldle_stats",stats)}
     store.set("mulldle",st);renderMulldle();const g=$("#mguess");if(g)g.focus()});
@@ -785,23 +785,23 @@ function drawSix(){const G=SIX,box=$("#sixgame");const n=G.steps.length;
 }
 function finishSix(){const G=SIX,n=G.steps.length,host=$("#sixres");
   if(G.gaveUp){award("six:"+G.date,0);host.innerHTML=duckHTML(`Six Degrees #${dayNo(G.date)}`,"Copy result for the group chat")+`<p class="q">Back tomorrow for a new starting player.</p><div class="chain"><p class="q">The Rockets Speed route from ${esc(nName(G.start))} (${G.min} steps):</p><ol>${bestRoute(G.start)}</ol>${G.cur!==G.start?`<p class="q">From where you got to (${esc(nName(G.cur))}):</p><ol>${bestRoute(G.cur)}</ol>`:""}</div>`;
-    $("#resagain").onclick=()=>copyText(`Six Degrees of Mullaney #${dayNo(G.date)}: ${nName(G.start)} → out for a duck 🦆
-${location.href.split("#")[0]}`,$("#resagain"));return}
+    const ag=host.querySelector(".resagain");ag.onclick=()=>copyText(`Six Degrees of Mullaney #${dayNo(G.date)}: ${nName(G.start)} → out for a duck 🦆
+${location.href.split("#")[0]}`,ag);return}
   const RATE=n<=G.min?["res-callme.png","Rockets Speed!","Straight down the quickest route. Trent Rockets approved.","Mullaney in Trent Rockets kit"]:
     n<=G.par-1?["res-hundred.png","Under par","Quicker than par. Bat raised.","Mullaney raising his bat"]:
     n===G.par?["res-young.png","Par","Steady. Gets the job done.","A young Mullaney"]:
     ["res-stern.png",`${n-G.par} over par`,"The skipper is not impressed.","Mullaney looking stern"];
   host.innerHTML=resultHTML(0,1,"Copy result for the group chat");
-  const r=$("#result");r.querySelector(".lbl").textContent=G.steps.some(st=>st.s<0)?"Chain complete (given on review)":"Chain complete";
+  const r=host.querySelector(".result");r.querySelector(".lbl").textContent=G.steps.some(st=>st.s<0)?"Chain complete (given on review)":"Chain complete";
   r.querySelector("img").src="img/"+RATE[0];r.querySelector("img").alt=RATE[3];
   r.querySelector(".score").textContent=`${n} step${n===1?"":"s"}`;
   r.querySelector(".pct").textContent=RATE[1]+(G.wides?` · ${G.wides} wide${G.wides===1?"":"s"}`:"");
   r.querySelector(".verdict").textContent=RATE[2]+` (Rockets Speed ${G.min}, par ${G.par})`;
   const base=n<=G.min?8:n<G.par?6:n===G.par?4:2;
   r.querySelector(".verdict").insertAdjacentHTML("afterend",ptsLine(award("six:"+G.date,Math.max(1,base-G.wides))));
-  $("#respick").remove();
+  r.querySelector(".respick").remove();
   const share=`Six Degrees of Mullaney #${dayNo(G.date)}: ${nName(G.start)} → Mullaney in ${n}. ${RATE[1]} (Rockets Speed ${G.min}, par ${G.par})${G.wides?`, ${G.wides} wide${G.wides===1?"":"s"}`:""} 🏏\n${location.href.split("#")[0]}`;
-  $("#resagain").onclick=()=>copyText(share,$("#resagain"));
+  const ag=r.querySelector(".resagain");ag.onclick=()=>copyText(share,ag);
   host.insertAdjacentHTML("beforeend",`<p class="q">Back tomorrow for a new starting player.</p>`);
   if(n>G.min)host.insertAdjacentHTML("beforeend",`<div class="chain"><p class="q">The Rockets Speed route was:</p><ol>${bestRoute(G.start)}</ol></div>`);
 }
@@ -834,8 +834,8 @@ function drawLink(){const L=LINK,box=$("#missing");
     ${L.done?`<ul class="links">${L.links.slice(0,15).map(([o,s])=>{const x=nSheet(s);return `<li class="${o===L.found?"hit":""}"><b>${esc(nName(o))}</b>: ${esc(x.txt)} · <a href="${ci(x.id)}" target="_blank" rel="noopener">Scorecard</a></li>`}).join("")}${L.links.length>15?`<li>…and ${L.links.length-15} more</li>`:""}</ul>
      <div class="actions"><button class="btn gold" id="lshare">Copy result for the group chat</button></div><p class="qprog">Back tomorrow for a new player.</p>`:""}
    </section>`;
-  if(L.done){if(L.gaveUp){$("#lshare").remove();$("#resagain").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: ${nName(L.t)}, out for a duck 🦆
-${location.href.split("#")[0]}`,$("#resagain"));return}
+  if(L.done){if(L.gaveUp){$("#lshare").remove();const ag=$("#missing .resagain");ag.onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: ${nName(L.t)}, out for a duck 🦆
+${location.href.split("#")[0]}`,ag);return}
   $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: ${nName(L.t)} ${L.gaveUp?"❌":"✅"}${L.wides?` (${L.wides} wide${L.wides===1?"":"s"})`:""} 🏏\n${location.href.split("#")[0]}`,$("#lshare"));return}
   $("#lgive").onclick=()=>{L.done=true;L.gaveUp=true;L.msg="";saveLink();drawLink()};
   const ones=NET.players.map((p,i)=>i).filter(i=>NET.dist[i]===1||CLUBM.has(i));
@@ -892,11 +892,11 @@ function renderAvg(){const box=$("#avgame"),M=AV.mullaney;
   if(!done){const ans=v=>{st.a.push(v);all[d]=st;store.set("avg_daily",all);renderAvg()};
     $("#avbetter").onclick=()=>ans(true);$("#avworse").onclick=()=>ans(false);return}
   const host=$("#avres");host.innerHTML=resultHTML(score,qs.length,"Copy result for the group chat");
-  const r=$("#result");r.querySelector(".lbl").textContent=`Better Than Mull? #${dayNo(d)}`;
+  const r=host.querySelector(".result");r.querySelector(".lbl").textContent=`Better Than Mull? #${dayNo(d)}`;
   r.querySelector(".verdict").insertAdjacentHTML("afterend",ptsLine(award("avg:"+d,Math.ceil(score/2))));
-  $("#respick").remove();
+  r.querySelector(".respick").remove();
   const share=`Better Than Mull? #${dayNo(d)} ${score}/${qs.length}\n${qs.map((q,k)=>st.a[k]===!q.mullBetter?"🟩":"🟥").join("")}\n${location.href.split("#")[0]}`;
-  $("#resagain").onclick=()=>copyText(share,$("#resagain"));
+  const ag=r.querySelector(".resagain");ag.onclick=()=>copyText(share,ag);
 }
 
 /* ===== CERTIFICATES ===== */
@@ -908,7 +908,7 @@ async function makeCertificate(rankName,pts,who){
   x.fillStyle=PAPER;x.fillRect(0,0,1600,1131);
   x.strokeStyle=G;x.lineWidth=28;x.strokeRect(14,14,1572,1103);x.strokeStyle=GOLD;x.lineWidth=6;x.strokeRect(46,46,1508,1039);
   x.fillStyle=G;x.fillRect(46,46,1508,150);
-  x.textAlign="center";x.fillStyle=GOLD;x.font='400 54px "Alfa Slab One", Georgia, serif';x.fillText("MULLANEY'S KITCHEN",800,120);
+  x.textAlign="center";x.fillStyle=GOLD;x.font='400 54px "Alfa Slab One", Georgia, serif';x.fillText("MULLANEY'S ACADEMY",800,120);
   x.fillStyle="#f7f3e3";x.font='700 24px "Courier Prime", monospace';x.fillText("OFFICIAL FAN CLUB  ·  TRENT BRIDGE END",800,168);
   try{const img=new Image();await within(new Promise((ok,no)=>{img.onload=ok;img.onerror=no;img.src="img/tb-headshot.jpg"}),3000);if(!img.naturalWidth)throw 0;
     x.save();x.beginPath();x.arc(800,340,110,0,Math.PI*2);x.closePath();x.clip();
@@ -936,13 +936,18 @@ function openCert(rankName){const lb=$("#certbox");
    <label class="season" for="certname">Name on the certificate</label>
    <input id="certname" maxlength="40" value="${esc(store.get("mk_certname",""))}" placeholder="Your name">
    <div class="certprev"><img id="certimg" alt="Certificate preview"></div>
-   <div class="actions"><button class="btn gold" id="certdl">Download PNG</button><button class="btn ghost" id="certclose">Close</button></div></div>`;
+   <div class="actions"><button class="btn gold" id="certdl">Save to Photos</button><button class="btn ghost" id="certclose">Close</button></div>
+   <small class="qprog">On a phone, choose "Save Image" in the share sheet. You can also press and hold the certificate above.</small></div>`;
   lb.hidden=false;document.body.style.overflow="hidden";
   let canvas=null;
   const draw=async()=>{const who=$("#certname").value.trim()||"A Loyal Supporter";store.set("mk_certname",$("#certname").value.trim());
     canvas=await makeCertificate(rankName,points(),who);$("#certimg").src=canvas.toDataURL("image/png")};
   let tmr;$("#certname").oninput=()=>{clearTimeout(tmr);tmr=setTimeout(draw,250)};draw();
-  $("#certdl").onclick=()=>{if(!canvas)return;canvas.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`mullaney-${rankName.toLowerCase().replace(/\W+/g,"-")}-certificate.png`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)})};
+  $("#certdl").onclick=()=>{if(!canvas)return;const fname=`mullaney-${rankName.toLowerCase().replace(/\W+/g,"-")}-certificate.jpg`;
+    canvas.toBlob(async b=>{const file=new File([b],fname,{type:"image/jpeg"});
+      /* Phones: the share sheet offers "Save Image", which goes straight to Photos */
+      if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:"Mullaney's Academy certificate"});return}catch(e){if(e&&e.name==="AbortError")return}}
+      const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)},"image/jpeg",0.92)};
   const close=()=>{lb.hidden=true;document.body.style.overflow=""};$("#certclose").onclick=close;lb.onclick=e=>{if(e.target===lb)close()};
 }
 
