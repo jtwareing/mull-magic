@@ -693,7 +693,8 @@ function renderMulldle(){
     store.set("mulldle",st);renderMulldle();const g=$("#mguess");if(g)g.focus()});
 }
 function mulldleShare(d,guesses,ans){const E={g:"🟩",y:"🟨",x:"⬜"};const won=guesses.includes(ans);
-  return `Mulldle #${dayNo(d)} ${won?guesses.length:"X"}/${MAXG}\n`+guesses.map(gp=>compare(gp,ans).map(c=>E[c.k]).join("")).join("\n")+`\n${location.href.split("#")[0]}`}
+  return `Mulldle #${dayNo(d)} ${won?guesses.length:"X"}/${MAXG}\n`+guesses.map(gp=>compare(gp,ans).map(c=>E[c.k]).join("")).join("\n")+`\n${SITE_URL}`}
+const SITE_URL=location.origin+location.pathname;   /* clean address for shared results */
 function copyText(text,btn){const done=()=>{const o=btn.textContent;btn.textContent="Copied";setTimeout(()=>btn.textContent=o,1600)};
   if(navigator.clipboard)navigator.clipboard.writeText(text).then(done).catch(()=>prompt("Copy this:",text));else prompt("Copy this:",text)}
 
@@ -786,7 +787,7 @@ function drawSix(){const G=SIX,box=$("#sixgame");const n=G.steps.length;
 function finishSix(){const G=SIX,n=G.steps.length,host=$("#sixres");
   if(G.gaveUp){award("six:"+G.date,0);host.innerHTML=duckHTML(`Six Degrees #${dayNo(G.date)}`,"Copy result for the group chat")+`<p class="q">Back tomorrow for a new starting player.</p><div class="chain"><p class="q">The Rockets Speed route from ${esc(nName(G.start))} (${G.min} steps):</p><ol>${bestRoute(G.start)}</ol>${G.cur!==G.start?`<p class="q">From where you got to (${esc(nName(G.cur))}):</p><ol>${bestRoute(G.cur)}</ol>`:""}</div>`;
     const ag=host.querySelector(".resagain");ag.onclick=()=>copyText(`Six Degrees of Mullaney #${dayNo(G.date)}: ${nName(G.start)} → out for a duck 🦆
-${location.href.split("#")[0]}`,ag);return}
+${SITE_URL}`,ag);return}
   const RATE=n<=G.min?["res-callme.png","Rockets Speed!","Straight down the quickest route. Trent Rockets approved.","Mullaney in Trent Rockets kit"]:
     n<=G.par-1?["res-hundred.png","Under par","Quicker than par. Bat raised.","Mullaney raising his bat"]:
     n===G.par?["res-young.png","Par","Steady. Gets the job done.","A young Mullaney"]:
@@ -800,7 +801,7 @@ ${location.href.split("#")[0]}`,ag);return}
   const base=n<=G.min?8:n<G.par?6:n===G.par?4:2;
   r.querySelector(".verdict").insertAdjacentHTML("afterend",ptsLine(award("six:"+G.date,Math.max(1,base-G.wides))));
   r.querySelector(".respick").remove();
-  const share=`Six Degrees of Mullaney #${dayNo(G.date)}: ${nName(G.start)} → Mullaney in ${n}. ${RATE[1]} (Rockets Speed ${G.min}, par ${G.par})${G.wides?`, ${G.wides} wide${G.wides===1?"":"s"}`:""} 🏏\n${location.href.split("#")[0]}`;
+  const share=`Six Degrees of Mullaney #${dayNo(G.date)}: ${nName(G.start)} → Mullaney in ${n}. ${RATE[1]} (Rockets Speed ${G.min}, par ${G.par})${G.wides?`, ${G.wides} wide${G.wides===1?"":"s"}`:""} 🏏\n${SITE_URL}`;
   const ag=r.querySelector(".resagain");ag.onclick=()=>copyText(share,ag);
   host.insertAdjacentHTML("beforeend",`<p class="q">Back tomorrow for a new starting player.</p>`);
   if(n>G.min)host.insertAdjacentHTML("beforeend",`<div class="chain"><p class="q">The Rockets Speed route was:</p><ol>${bestRoute(G.start)}</ol></div>`);
@@ -834,9 +835,9 @@ function drawLink(){const L=LINK,box=$("#missing");
     ${L.done?`<ul class="links">${L.links.slice(0,15).map(([o,s])=>{const x=nSheet(s);return `<li class="${o===L.found?"hit":""}"><b>${esc(nName(o))}</b>: ${esc(x.txt)} · <a href="${ci(x.id)}" target="_blank" rel="noopener">Scorecard</a></li>`}).join("")}${L.links.length>15?`<li>…and ${L.links.length-15} more</li>`:""}</ul>
      <div class="actions"><button class="btn gold" id="lshare">Copy result for the group chat</button></div><p class="qprog">Back tomorrow for a new player.</p>`:""}
    </section>`;
-  if(L.done){if(L.gaveUp){$("#lshare").remove();const ag=$("#missing .resagain");ag.onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: ${nName(L.t)}, out for a duck 🦆
-${location.href.split("#")[0]}`,ag);return}
-  $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: ${nName(L.t)} ${L.gaveUp?"❌":"✅"}${L.wides?` (${L.wides} wide${L.wides===1?"":"s"})`:""} 🏏\n${location.href.split("#")[0]}`,$("#lshare"));return}
+  if(L.done){if(L.gaveUp){$("#lshare").remove();const ag=$("#missing .resagain");ag.onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: out for a duck 🦆
+${SITE_URL}`,ag);return}
+  $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)} ${L.gaveUp?"❌":"✅"}${L.wides?` (${L.wides} wide${L.wides===1?"":"s"})`:""} 🏏\n${SITE_URL}`,$("#lshare"));return}
   $("#lgive").onclick=()=>{L.done=true;L.gaveUp=true;L.msg="";saveLink();drawLink()};
   const ones=NET.players.map((p,i)=>i).filter(i=>NET.dist[i]===1||CLUBM.has(i));
   if(L.review!=null)$("#lreview").onclick=()=>{const c=L.review;L.review=null;const s=sharedSheet(c,L.t);
@@ -895,7 +896,7 @@ function renderAvg(){const box=$("#avgame"),M=AV.mullaney;
   const r=host.querySelector(".result");r.querySelector(".lbl").textContent=`Better Than Mull? #${dayNo(d)}`;
   r.querySelector(".verdict").insertAdjacentHTML("afterend",ptsLine(award("avg:"+d,Math.ceil(score/2))));
   r.querySelector(".respick").remove();
-  const share=`Better Than Mull? #${dayNo(d)} ${score}/${qs.length}\n${qs.map((q,k)=>st.a[k]===!q.mullBetter?"🟩":"🟥").join("")}\n${location.href.split("#")[0]}`;
+  const share=`Better Than Mull? #${dayNo(d)} ${score}/${qs.length}\n${qs.map((q,k)=>st.a[k]===!q.mullBetter?"🟩":"🟥").join("")}\n${SITE_URL}`;
   const ag=r.querySelector(".resagain");ag.onclick=()=>copyText(share,ag);
 }
 
