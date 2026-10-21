@@ -891,7 +891,7 @@ function renderAvg(){const box=$("#avgame"),M=AV.mullaney;
   const pips=qs.map((q,k)=>`<span class="ballpip ${k<i?(st.a[k]===!q.mullBetter?"y":"n"):""}"></span>`).join("");
   box.innerHTML=`<div class="sec-head"><h2>Better Than Mull? #${dayNo(d)}</h2><span class="qprog">Ten new players at midnight (UK)</span></div>
    <p class="note">Is each player's first-class career average better or worse than Steven Mullaney's? Higher is better for batting, lower is better for bowling.</p>
-   <div class="mullbench"><div><span class="lbl2">Mullaney batting average</span><b>${M.bat.toFixed(2)}</b></div><div><span class="lbl2">Mullaney bowling average</span><b>${M.bowl.toFixed(2)}</b></div><small>First-class career${esc(asOf)}</small></div>
+   <div class="mullbench"><div><span class="lbl2">Mullaney batting average</span><b>${M.bat.toFixed(2)}</b></div><div><span class="lbl2">Mullaney bowling average</span><b>${M.bowl.toFixed(2)}</b></div><small>First-class career</small></div>
    <section class="panel">
     <div class="qprog">${pips}</div>
     ${last}
