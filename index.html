@@ -351,7 +351,8 @@ const label=s=>s==="all"?"2014 to 2023":s;
 const totalRuns=MS.reduce((a,m)=>a+m.bat.reduce((x,b)=>x+b[0],0),0);
 const totalW=MS.reduce((a,m)=>a+m.wk.length,0);
 const mates=new Set(MS.flatMap(m=>m.xi));
-$("#chips").innerHTML=[[MS.length,"matches"],[totalRuns.toLocaleString("en-GB"),"runs"],[totalW,"wickets"],[mates.size,"teammates"]].map(([n,l])=>`<span class="chip"><b>${n}</b> ${l}</span>`).join("")+`<a class="chip kofi-chip" href="https://ko-fi.com/jameswareing" target="_blank" rel="noopener">☕ Buy the scorer a coffee</a>`;
+/* Career totals, all formats (first-class + List A + T20), from his Cricinfo profile as quoted on Wikipedia; match Notts' retirement figures */
+$("#chips").innerHTML=[["492","career matches"],["14,275","runs"],["377","wickets"],["100+","teammates"]].map(([n,l])=>`<span class="chip"><b>${n}</b> ${l}</span>`).join("")+`<a class="chip kofi-chip" href="https://ko-fi.com/jameswareing" target="_blank" rel="noopener">☕ Buy the scorer a coffee</a>`;
 
 /* name matching */
 const norm=s=>s.normalize("NFD").replace(/\p{M}/gu,"").toLowerCase().replace(/[^a-z]/g,"");
