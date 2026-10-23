@@ -227,6 +227,8 @@ th,td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--line);whit
 th:first-child,td:first-child{text-align:left}
 thead th{background:var(--green);color:var(--on-green);font-weight:700}
 .note{color:var(--muted);font-size:14px;max-width:70ch}
+.kofi a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--line)}
+.kofi a:hover{color:var(--green);border-bottom-color:var(--green)}
 footer{margin-block:40px 32px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;display:grid;gap:6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -249,7 +251,7 @@ footer{margin-block:40px 32px;padding-top:16px;border-top:1px solid var(--line);
   <div class="wrap">
     <header class="hero">
       <div>
-        <div class="eyebrow"><svg class="i"><use href="#i-bat"/></svg>Official Fan Club · Trent Bridge end</div>
+        <div class="eyebrow"><svg class="i"><use href="#i-bat"/></svg>(Un)official Fan Club · Trent Bridge end</div>
         <h1>If you cannot handle the <span class="hl">heat</span>, get out of Mullaney's kitchen</h1>
         <p class="lede">A fan-run quiz club for the Steven Mullaney faithful. Every answer comes straight off a real scorecard, so if you get one wrong, it's plumb.</p>
         <div class="chips" id="chips"></div>
@@ -307,7 +309,8 @@ footer{margin-block:40px 32px;padding-top:16px;border-top:1px solid var(--line);
 
   <footer>
     <div>Match data: <a href="https://cricsheet.org" target="_blank" rel="noopener">Cricsheet</a>, 2014 to 2023 (County Championship, Bob Willis Trophy, One-Day Cup, T20 Blast, The Hundred).</div>
-    <div>Before 2014 is not covered by the match quizzes yet. Affectionate parody by fans; not affiliated with Steven Mullaney or Nottinghamshire CCC.</div>
+    <div>Before 2014 is not covered by the match quizzes yet. Affectionate site made by fans; not affiliated with Steven Mullaney or Nottinghamshire CCC.</div>
+    <div class="kofi"><a href="https://ko-fi.com/jameswareing" target="_blank" rel="noopener">Enjoying Mull Magic? ☕ Buy the scorer a coffee</a></div>
   </footer>
 </div>
 
@@ -918,7 +921,7 @@ async function makeCertificate(rankName,pts,who){
   x.strokeStyle=G;x.lineWidth=28;x.strokeRect(14,14,1572,1103);x.strokeStyle=GOLD;x.lineWidth=6;x.strokeRect(46,46,1508,1039);
   x.fillStyle=G;x.fillRect(46,46,1508,150);
   x.textAlign="center";x.fillStyle=GOLD;x.font='400 54px "Alfa Slab One", Georgia, serif';x.fillText("MULLANEY'S ACADEMY",800,120);
-  x.fillStyle="#f7f3e3";x.font='700 24px "Courier Prime", monospace';x.fillText("OFFICIAL FAN CLUB  ·  TRENT BRIDGE END",800,168);
+  x.fillStyle="#f7f3e3";x.font='700 24px "Courier Prime", monospace';x.fillText("(UN)OFFICIAL FAN CLUB  ·  TRENT BRIDGE END",800,168);
   try{const img=new Image();await within(new Promise((ok,no)=>{img.onload=ok;img.onerror=no;img.src="img/tb-headshot.jpg"}),3000);if(!img.naturalWidth)throw 0;
     x.save();x.beginPath();x.arc(800,340,110,0,Math.PI*2);x.closePath();x.clip();
     const s=Math.max(220/img.width,220/img.height);x.drawImage(img,800-img.width*s/2,340-110-img.height*s*0.08,img.width*s,img.height*s);x.restore();
