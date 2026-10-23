@@ -844,7 +844,7 @@ function drawLink(){const L=LINK,box=$("#missing");
   let ptsHTML="";
   if(L.done){const a=award("link:"+L.date,L.gaveUp?0:Math.max(1,5-L.wides));ptsHTML=L.gaveUp?duckHTML(`The Missing Link #${dayNo(L.date)}`,"Copy result for the group chat"):`<div class="result-mini">${ptsLine(a)}</div>`}
   box.innerHTML=`<div class="sec-head"><h2>The Missing Link #${dayNo(L.date)}</h2><span class="qprog">New player at midnight (UK)</span></div>
-   <p class="note">Today's cricketer never played with Mullaney, but he shared an XI with at least one of his teammates. Name a Mullaney teammate who played alongside him. 5 points for a correct answer, minus 1 for each wide.</p>
+   <p class="note">Today's cricketer regrets that he never played with Mullaney, but he shared an XI with at least one of his teammates. Name a Mullaney teammate who played alongside him. 5 points for a correct answer, minus 1 for each wide.</p>
    <section class="panel"><div class="sixtop"><div><div class="lbl2">Mystery link to</div><div class="target">${esc(nName(L.t))}</div><div class="sub2">${esc(recentTeams(L.t).join(" · "))}</div></div>
      <div class="scorebox"><div><div class="big">${L.links.length}</div><small>possible links</small></div><div><div class="big">${L.wides}</div><small>wides</small></div></div></div>
     ${L.done?"":`<div class="entry sugg-wrap"><input id="lguess" autocomplete="off" spellcheck="false" placeholder="A Mullaney teammate…" aria-label="Name the missing link"><ul class="sugg" id="lsugg" hidden role="listbox"></ul><button class="btn ghost" id="lgive">Show me</button></div>
