@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="A fan quiz club for the Steven Mullaney faithful.">
 <style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Mull Magic</title>
+<title>Mullaney Magic</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Mrs+Saint+Delafield&family=Courier+Prime:wght@400;700&family=Archivo:wght@400;600;800&display=swap">
 <style>
@@ -227,8 +227,11 @@ th,td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--line);whit
 th:first-child,td:first-child{text-align:left}
 thead th{background:var(--green);color:var(--on-green);font-weight:700}
 .note{color:var(--muted);font-size:14px;max-width:70ch}
-.kofi a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--line)}
-.kofi a:hover{color:var(--green);border-bottom-color:var(--green)}
+.kofi{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:6px;color:var(--ink);font-weight:600}
+.kofi-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#1b1400;text-decoration:none;font-weight:700;padding:8px 16px;border-radius:999px;box-shadow:var(--shadow);transition:transform .15s}
+.kofi-btn:hover,.kofi-btn:focus-visible{transform:translateY(-2px)}
+.chip.kofi-chip{background:var(--gold);color:#1b1400;border-color:var(--gold);text-decoration:none;font-weight:700}
+.chip.kofi-chip:hover{filter:brightness(1.05)}
 footer{margin-block:40px 32px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;display:grid;gap:6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -310,7 +313,7 @@ footer{margin-block:40px 32px;padding-top:16px;border-top:1px solid var(--line);
   <footer>
     <div>Match data: <a href="https://cricsheet.org" target="_blank" rel="noopener">Cricsheet</a>, 2014 to 2023 (County Championship, Bob Willis Trophy, One-Day Cup, T20 Blast, The Hundred).</div>
     <div>Before 2014 is not covered by the match quizzes yet. Affectionate site made by fans; not affiliated with Steven Mullaney or Nottinghamshire CCC.</div>
-    <div class="kofi"><a href="https://ko-fi.com/jameswareing" target="_blank" rel="noopener">Enjoying Mull Magic? ☕ Buy the scorer a coffee</a></div>
+    <div class="kofi"><span>Enjoying Mullaney Magic?</span><a class="kofi-btn" href="https://ko-fi.com/jameswareing" target="_blank" rel="noopener">☕ Buy the scorer a coffee</a></div>
   </footer>
 </div>
 
@@ -344,7 +347,7 @@ const label=s=>s==="all"?"2014 to 2023":s;
 const totalRuns=MS.reduce((a,m)=>a+m.bat.reduce((x,b)=>x+b[0],0),0);
 const totalW=MS.reduce((a,m)=>a+m.wk.length,0);
 const mates=new Set(MS.flatMap(m=>m.xi));
-$("#chips").innerHTML=[[MS.length,"matches"],[totalRuns.toLocaleString("en-GB"),"runs"],[totalW,"wickets"],[mates.size,"teammates"]].map(([n,l])=>`<span class="chip"><b>${n}</b> ${l}</span>`).join("");
+$("#chips").innerHTML=[[MS.length,"matches"],[totalRuns.toLocaleString("en-GB"),"runs"],[totalW,"wickets"],[mates.size,"teammates"]].map(([n,l])=>`<span class="chip"><b>${n}</b> ${l}</span>`).join("")+`<a class="chip kofi-chip" href="https://ko-fi.com/jameswareing" target="_blank" rel="noopener">☕ Buy the scorer a coffee</a>`;
 
 /* name matching */
 const norm=s=>s.normalize("NFD").replace(/\p{M}/gu,"").toLowerCase().replace(/[^a-z]/g,"");
