@@ -407,7 +407,7 @@ const points=()=>quizPoints()+dailyPoints();
 function award(key,pts){if(key in daily)return {pts:daily[key],fresh:false};daily[key]=pts;store.set("mk_daily",daily);renderCareer();return {pts,fresh:true}}
 function awardAdd(key,cap){const cur=daily[key]||0;if(cur>=cap)return 0;daily[key]=cur+1;store.set("mk_daily",daily);renderCareer();return 1}
 /* Daily play counter (Cloudflare Worker). Leave COUNTER_URL empty to switch counting off. */
-const COUNTER_URL="";
+const COUNTER_URL="https://mullaney-counter.jtwareing.workers.dev";
 function sendPlay(game,date,result,score){if(!COUNTER_URL)return;const sent=store.get("mk_sent",{}),k=game+":"+date;if(sent[k])return;sent[k]=1;store.set("mk_sent",sent);
   try{fetch(COUNTER_URL.replace(/\/$/,"")+"/hit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({game,date,result,score}),keepalive:true}).catch(()=>{})}catch(e){}}
 const ptsLine=a=>`<div class="ptsline">${!a.pts?"No career points today":a.fresh?`+${a.pts} career point${a.pts===1?"":"s"}`:`${a.pts} career point${a.pts===1?"":"s"} earned today`}</div>`;
