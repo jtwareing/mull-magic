@@ -948,7 +948,16 @@ async function makeCertificate(rankName,pts,who){
   x.font='400 64px "Mrs Saint Delafield", "Brush Script MT", cursive';x.fillText("S. Mullaney",1230,975);x.strokeStyle=INK;x.lineWidth=2;x.beginPath();x.moveTo(1040,990);x.lineTo(1420,990);x.stroke();
   x.font='700 20px "Courier Prime", monospace';x.fillText("THE SKIPPER",1230,1022);
   x.beginPath();x.arc(370,960,78,0,Math.PI*2);x.fillStyle=GOLD;x.fill();x.lineWidth=6;x.strokeStyle=G;x.stroke();
-  x.fillStyle=G;x.font='400 26px "Alfa Slab One", Georgia, serif';x.fillText("IF YOU",370,945);x.fillText("CAN'T STAND",370,975);x.font='400 18px "Alfa Slab One", Georgia, serif';x.fillText("THE HEAT…",370,1000);
+  /* seal text: each line shrinks until it fits the circle's width at that height */
+  x.fillStyle=G;x.textBaseline="middle";
+  const SEAL_R=78-12;
+  const SEAL=[["IF YOU",-26],["CAN'T STAND",0],["THE HEAT…",26]];
+  const fit=([txt,dy])=>{const room=2*Math.sqrt(Math.max(0,SEAL_R*SEAL_R-(Math.abs(dy)+9)**2));let fs=24;
+    do{x.font=`400 ${fs}px "Alfa Slab One", Georgia, serif`;if(x.measureText(txt).width<=room)break;fs--}while(fs>8);return fs};
+  const sealFs=Math.min(...SEAL.map(fit));   /* one size for all lines, so the seal looks even */
+  x.font=`400 ${sealFs}px "Alfa Slab One", Georgia, serif`;
+  for(const [txt,dy] of SEAL)x.fillText(txt,370,960+dy);
+  x.textBaseline="alphabetic";
   return c;
 }
 function certSection(p){const unlocked=RANKS.filter(r=>p>=r[0]);
