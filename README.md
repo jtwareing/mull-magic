@@ -6,6 +6,7 @@ A fan-run quiz site for the Steven Mullaney faithful.
 - **Mulldle:** a daily guess-the-teammate game
 - **Six Degrees:** a daily chain from a cricketer to Mullaney through shared XIs
 - **The Missing Link:** a daily puzzle to name the Mullaney teammate who links to a cricketer
+- **A Day in the Life:** a daily innings where Mullaney took 2+ wickets; name the batters he dismissed from their team and batting position
 - **Career Mode:** points from quizzes and daily games unlock his career milestones, with certificates
 
 Match data comes from [Cricsheet](https://cricsheet.org). Answers link to Cricinfo scorecards. Progress is saved in each player's own browser.

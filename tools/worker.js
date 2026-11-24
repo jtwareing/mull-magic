@@ -2,7 +2,7 @@
 // POST /hit  {"game":"mulldle","date":"2026-10-28","result":"won"|"lost","score":7}  -> adds 1 (and the score, if sent)
 // GET  /stats -> table of daily counts for every game
 const SITE = "https://mullaneymagic.co.uk";
-const GAMES = ["mulldle", "six", "link", "avg"];
+const GAMES = ["mulldle", "six", "link", "day", "avg"];
 
 export default {
   async fetch(req, env) {
@@ -46,10 +46,10 @@ export default {
 <h1>Mullaney Magic: daily plays</h1>
 <p>Finished games per day (UK date). One count per game per device per day.</p>
 <div class="wrap"><table><thead>
-<tr><th></th><th colspan="3">Mulldle</th><th colspan="3">Six Degrees</th><th colspan="3">The Missing Link</th><th colspan="2">Better Than Mull?</th></tr>
-<tr><th>Date</th><th>Played</th><th>Solved</th><th>Not solved</th><th>Played</th><th>Completed</th><th>Duck</th><th>Played</th><th>Correct</th><th>Duck</th><th>Played</th><th>Avg score</th></tr>
+<tr><th></th><th colspan="3">Mulldle</th><th colspan="3">Six Degrees</th><th colspan="3">The Missing Link</th><th colspan="3">A Day in the Life</th><th colspan="2">Better Than Mull?</th></tr>
+<tr><th>Date</th><th>Played</th><th>Solved</th><th>Not solved</th><th>Played</th><th>Completed</th><th>Duck</th><th>Played</th><th>Correct</th><th>Duck</th><th>Played</th><th>All named</th><th>Not all</th><th>Played</th><th>Avg score</th></tr>
 </thead><tbody>
-${dates.map(d => `<tr><td>${d}</td><td>${c(d,"mulldle:played")}</td><td>${c(d,"mulldle:won")}</td><td>${c(d,"mulldle:lost")}</td><td>${c(d,"six:played")}</td><td>${c(d,"six:won")}</td><td>${c(d,"six:lost")}</td><td>${c(d,"link:played")}</td><td>${c(d,"link:won")}</td><td>${c(d,"link:lost")}</td><td>${c(d,"avg:played")}</td><td>${avg(d)}</td></tr>`).join("") || '<tr><td colspan="12">No plays yet</td></tr>'}
+${dates.map(d => `<tr><td>${d}</td><td>${c(d,"mulldle:played")}</td><td>${c(d,"mulldle:won")}</td><td>${c(d,"mulldle:lost")}</td><td>${c(d,"six:played")}</td><td>${c(d,"six:won")}</td><td>${c(d,"six:lost")}</td><td>${c(d,"link:played")}</td><td>${c(d,"link:won")}</td><td>${c(d,"link:lost")}</td><td>${c(d,"day:played")}</td><td>${c(d,"day:won")}</td><td>${c(d,"day:lost")}</td><td>${c(d,"avg:played")}</td><td>${avg(d)}</td></tr>`).join("") || '<tr><td colspan="15">No plays yet</td></tr>'}
 </tbody></table></div>`;
       return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
     }
