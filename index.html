@@ -103,12 +103,11 @@ h1 .hl{color:var(--gold)}
 .links{padding-left:18px;font-size:14px;display:grid;gap:4px}
 .links li.hit{color:var(--good);font-weight:600}
 .dwk{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
-.dwk li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;border:1px dashed var(--muted);border-radius:3px;padding:8px 12px}
+.dwk li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:center;border:1px dashed var(--muted);border-radius:3px;padding:8px 12px}
 .dwk li.got{border-style:solid;border-color:var(--good)}.dwk li.miss{border-style:solid;border-color:#b3261e}
 .dwk .no{font-family:var(--display);font-size:22px;color:var(--green)}
 .dwk .who{font-weight:700}.dwk li.got .who{color:var(--good)}.dwk li.miss .who{color:#b3261e}
 .dwk small{display:block;color:var(--muted);font-family:var(--mono);font-size:12px}
-.dwk .btn{padding:4px 10px;font-size:13px}
 /* Better Than Mull? */
 .mullbench{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--green);color:var(--on-green);border-bottom:4px solid var(--gold);padding:12px 16px;border-radius:3px;margin-bottom:4px}
 .mullbench div{display:grid}.mullbench .lbl2{color:var(--on-green);opacity:.8}
@@ -902,13 +901,12 @@ const DAYPOOL=(()=>{const a=DAYS.slice(),r=mulberry(2017);for(let i=a.length-1;i
 const DAY_PTS=3,DAY_MAXW=5;
 function howOut(w){const f=w[4],fs=typeof f==="number"?sur(f):String(f).split(" ").pop();
   return w[2]==="caught"?`c ${fs} b Mullaney`:w[2]==="caught and bowled"?"c & b Mullaney":w[2]==="stumped"?`st ${fs} b Mullaney`:w[2]==="lbw"?"lbw b Mullaney":"b Mullaney"}
-const initials=p=>name(p).split(/[\s-]+/).map(w=>w[0]).join(".")+".";
 let DAY=null;
 function loadDay(){const d=londonDate(),n=dayNo(d),x=DAYPOOL[((n%DAYPOOL.length)+DAYPOOL.length)%DAYPOOL.length];
   const sv=(store.get("day_daily",{}))[d]||{};
-  DAY={date:d,x,found:sv.found||[],hints:sv.hints||[],wides:sv.wides||0,done:!!sv.done,msg:""}}
-function saveDay(){const all=store.get("day_daily",{});all[DAY.date]={found:DAY.found,hints:DAY.hints,wides:DAY.wides,done:DAY.done};store.set("day_daily",all)}
-const dayScore=G=>G.found.length?Math.max(1,G.found.length*DAY_PTS-G.wides-G.hints.length):0;
+  DAY={date:d,x,found:sv.found||[],wides:sv.wides||0,done:!!sv.done,msg:""}}
+function saveDay(){const all=store.get("day_daily",{});all[DAY.date]={found:DAY.found,wides:DAY.wides,done:DAY.done};store.set("day_daily",all)}
+const dayScore=G=>G.found.length?Math.max(1,G.found.length*DAY_PTS-G.wides):0;
 function renderDay(){if(!DAY||DAY.date!==londonDate())loadDay();drawDay()}
 function drawDay(){const G=DAY,x=G.x,box=$("#daylife"),n=x.w.length;
   if(!G.done&&(G.found.length===n||G.wides>=DAY_MAXW)){G.done=true;saveDay()}
@@ -916,22 +914,20 @@ function drawDay(){const G=DAY,x=G.x,box=$("#daylife"),n=x.w.length;
   if(G.done){const sc=dayScore(G),a=award("day:"+G.date,sc);sendPlay("day",G.date,G.found.length===n?"won":"lost",sc);
     ptsHTML=G.found.length?`<div class="result-mini">${ptsLine(a)}</div>`:duckHTML(`A Day in the Life #${dayNo(G.date)}`,"Copy result for the group chat")}
   box.innerHTML=`<div class="sec-head"><h2>A Day in the Life #${dayNo(G.date)}</h2><span class="qprog">New day at midnight (UK)</span></div>
-   <p class="note">Pull on the whites: here's a day when Mullaney had the ball in his hand. You get the opposition, each batter's position in the order and how he got them. Name every batter he dismissed. ${DAY_PTS} points a wicket, minus 1 for each wide or initials hint. ${DAY_MAXW} wides and you're taken off.</p>
+   <p class="note">Pull on the whites: here's a day when Mullaney had the ball in his hand. You get the opposition, each batter's position in the order and how he got them. Name every batter he dismissed. ${DAY_PTS} points a wicket, minus 1 for each wide. ${DAY_MAXW} wides and you're taken off.</p>
    <section class="panel"><div class="sixtop"><div><div class="lbl2">${esc(fmtD(x.d))} · ${esc(x.c)}</div><div class="target">v ${esc(x.o)}</div><div class="sub2">${esc(x.v)}${G.done?` · ${esc(x.r)}`:""}</div></div>
      <div class="scorebox"><div><div class="big">${esc(x.fig)}</div><small>${esc(x.ov)} overs</small></div><div><div class="big">${G.found.length}/${n}</div><small>named</small></div><div><div class="big">${G.wides}</div><small>wides</small></div></div></div>
     ${G.done?"":`<div class="entry sugg-wrap"><input id="dguess" autocomplete="off" spellcheck="false" placeholder="Name a batter he dismissed…" aria-label="Name a batter Mullaney dismissed"><ul class="sugg" id="dsugg" hidden role="listbox"></ul><button class="btn ghost" id="dgive">Show me</button></div>`}
     <div class="flash" id="dmsg">${esc(G.msg||(G.done?(G.found.length===n?"Golden arm. You named the lot.":"Stumps. Here's how the day went."):""))}</div>
-    <ol class="dwk">${x.w.map((w,i)=>{const got=G.found.includes(i),show=got||G.done,hint=G.hints.includes(i);
-      return `<li class="${got?"got":G.done?"miss":""}"><span class="no">${i+1}</span><div><span class="who">${show?esc(name(w[0])):hint?`Initials: ${esc(initials(w[0]))}`:"? ? ?"}</span>
-        <small>${esc(x.o)} No. ${w[1]} · ${esc(howOut(w))} · over ${w[3]}</small></div>
-        ${show||hint?"":`<button class="btn ghost" data-hint="${i}" title="Show initials (costs 1 point)">Initials</button>`}</li>`}).join("")}</ol>
+    <ol class="dwk">${x.w.map((w,i)=>{const got=G.found.includes(i),show=got||G.done;
+      return `<li class="${got?"got":G.done?"miss":""}"><span class="no">${i+1}</span><div><span class="who">${show?esc(name(w[0])):"? ? ?"}</span>
+        <small>${esc(x.o)} No. ${w[1]} · ${esc(howOut(w))} · over ${w[3]}</small></div></li>`}).join("")}</ol>
     ${ptsHTML}
     ${G.done?`<p class="note"><a href="${ci(x.id)}" target="_blank" rel="noopener">Full scorecard on Cricinfo</a></p><div class="actions"><button class="btn gold" id="dshare">Copy result for the group chat</button></div><p class="qprog">Back tomorrow for another day.</p>`:""}
    </section>`;
   const share=()=>`A Day in the Life #${dayNo(G.date)} 🏏 ${G.found.length}/${n}\n${x.w.map((w,i)=>G.found.includes(i)?"🟩":"🟥").join("")} (${G.wides} wide${G.wides===1?"":"s"})\n${SITE_URL}`;
   if(G.done){const b=$("#dshare");if(G.found.length){b.onclick=()=>copyText(share(),b)}else{b.remove();const ag=$("#daylife .resagain");if(ag)ag.onclick=()=>copyText(share(),ag)}return}
   $("#dgive").onclick=()=>{G.done=true;G.msg="";saveDay();drawDay()};
-  box.querySelectorAll("[data-hint]").forEach(b=>b.onclick=()=>{const i=+b.dataset.hint;if(!G.hints.includes(i))G.hints.push(i);saveDay();drawDay()});
   const pool=PL.map((p,i)=>i);
   suggestBox($("#dguess"),$("#dsugg"),q=>matchNames(q,pool,name).map(i=>({label:name(i),i})),it=>{
     const k=x.w.findIndex(w=>w[0]===it.i);
