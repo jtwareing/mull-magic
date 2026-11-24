@@ -914,7 +914,7 @@ function drawDay(){const G=DAY,x=G.x,box=$("#daylife"),n=x.w.length;
   if(!G.done&&(G.found.length===n||G.wides>=DAY_MAXW)){G.done=true;saveDay()}
   let ptsHTML="";
   if(G.done){const sc=dayScore(G),a=award("day:"+G.date,sc);sendPlay("day",G.date,G.found.length===n?"won":"lost",sc);
-    const k=G.found.length,R=k===n?["day-full.jpg","Full marks","Every one of them. Straight in for the team hug.","Mullaney celebrating a wicket with a teammate","70% 15%"]:
+    const k=G.found.length,R=k===n?["day-full.jpg","Full marks","Absolutely plumb! Another day of true Mull Magic.","Mullaney celebrating a wicket with a teammate","70% 15%"]:
       k?["day-some.jpg",`${k} of ${n}`,"Finger up, job half done. There's another spell after lunch.","Mullaney raising a finger after taking a wicket","56% 30%"]:
       ["day-none.jpg","None named","Huge appeal. Not out. Not one of them.","Mullaney appealing with arms spread","50% 30%"];
     ptsHTML=`<div class="result" tabindex="-1"><img src="img/${R[0]}" alt="${esc(R[3])}" style="object-position:${R[4]}">
