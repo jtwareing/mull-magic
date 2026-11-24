@@ -833,6 +833,11 @@ ${SITE_URL}`,ag);return}
 
 /* ===== THE MISSING LINK (daily) ===== */
 let LINK=null,LINKPOOL=null;
+/* Nationality = the national sides a player appears for on our scorecards. Uncapped players have none, so no bonus is given for them. */
+const NAT_SIDES=new Set(["England","Australia","India","South Africa","New Zealand","Pakistan","Sri Lanka","West Indies","Bangladesh","Afghanistan","Zimbabwe","Ireland","Scotland","Netherlands","Namibia","Canada","Kenya","United States of America","Bermuda","United Arab Emirates","Hong Kong","Nepal","Oman","Papua New Guinea","Italy","Denmark","Germany","Jersey","Guernsey","Uganda","Singapore","Malaysia","Nigeria"]);
+function natsOf(i){const s=new Set();for(const x of NET.mem[i]){const t=NET.teams[NET.sheets[x][1]];if(NAT_SIDES.has(t))s.add(t)}return s}
+const LINK_BONUS=5;
+function linkBonus(ans,t){const a=natsOf(ans),b=natsOf(t);if(!a.size||!b.size)return 0;for(const n of a)if(b.has(n))return 0;return LINK_BONUS}
 function linksFor(t){const seen=new Map();const a=NET.mem[t];for(let k=a.length-1;k>=0;k--){for(const o of NET.sp[a[k]])if(NET.dist[o]===1&&!seen.has(o))seen.set(o,a[k])}return [...seen.entries()]}
 function linkPool(){if(!LINKPOOL){LINKPOOL=sixPool().slice();const r=mulberry(2022);for(let i=LINKPOOL.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[LINKPOOL[i],LINKPOOL[j]]=[LINKPOOL[j],LINKPOOL[i]]}}return LINKPOOL}
 function loadLink(){const d=londonDate(),pool=linkPool(),six=sixPool(),n=dayNo(d),L6=six[((n%six.length)+six.length)%six.length];
@@ -847,9 +852,9 @@ async function renderLink(){const box=$("#missing");
   if(!LINK||LINK.date!==londonDate())loadLink();drawLink()}
 function drawLink(){const L=LINK,box=$("#missing");
   let ptsHTML="";
-  if(L.done){const a=award("link:"+L.date,L.gaveUp?0:Math.max(1,5-L.wides));sendPlay("link",L.date,L.gaveUp?"lost":"won");ptsHTML=L.gaveUp?duckHTML(`The Missing Link #${dayNo(L.date)}`,"Copy result for the group chat"):`<div class="result-mini">${ptsLine(a)}</div>`}
+  if(L.done){const bonus=L.gaveUp?0:linkBonus(L.found,L.t);const a=award("link:"+L.date,L.gaveUp?0:Math.max(1,5-L.wides)+bonus);sendPlay("link",L.date,L.gaveUp?"lost":"won");ptsHTML=L.gaveUp?duckHTML(`The Missing Link #${dayNo(L.date)}`,"Copy result for the group chat"):`<div class="result-mini">${bonus?`<div class="ptsline">🌍 Overseas bonus: ${esc(nName(L.found))} (${esc([...natsOf(L.found)].join("/"))}) and ${esc(nName(L.t))} (${esc([...natsOf(L.t)].join("/"))}) played for different countries, +${bonus} points</div>`:""}${ptsLine(a)}</div>`}
   box.innerHTML=`<div class="sec-head"><h2>The Missing Link #${dayNo(L.date)}</h2><span class="qprog">New player at midnight (UK)</span></div>
-   <p class="note">Today's cricketer regrets that he never played with Mullaney, but he shared an XI with at least one of his teammates. Name a Mullaney teammate who played alongside him. 5 points for a correct answer, minus 1 for each wide.</p>
+   <p class="note">Today's cricketer regrets that he never played with Mullaney, but he shared an XI with at least one of his teammates. Name a Mullaney teammate who played alongside him. 5 points for a correct answer, minus 1 for each wide. Bonus 5 points if your link played international cricket for a different country to today's player.</p>
    <section class="panel"><div class="sixtop"><div><div class="lbl2">Mystery link to</div><div class="target">${esc(nName(L.t))}</div><div class="sub2">${esc(recentTeams(L.t).join(" · "))}</div></div>
      <div class="scorebox"><div><div class="big">${L.links.length}</div><small>possible links</small></div><div><div class="big">${L.wides}</div><small>wides</small></div></div></div>
     ${L.done?"":`<div class="entry sugg-wrap"><input id="lguess" autocomplete="off" spellcheck="false" placeholder="A Mullaney teammate…" aria-label="Name the missing link"><ul class="sugg" id="lsugg" hidden role="listbox"></ul><button class="btn ghost" id="lgive">Show me</button></div>
@@ -861,7 +866,7 @@ function drawLink(){const L=LINK,box=$("#missing");
    </section>`;
   if(L.done){if(L.gaveUp){$("#lshare").remove();const ag=$("#missing .resagain");ag.onclick=()=>copyText(`The Missing Link #${dayNo(L.date)}: out for a duck 🦆
 ${SITE_URL}`,ag);return}
-  $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)} ${L.gaveUp?"❌":"✅"} (${L.wides} wide${L.wides===1?"":"s"}) 🏏\n${SITE_URL}`,$("#lshare"));return}
+  $("#lshare").onclick=()=>copyText(`The Missing Link #${dayNo(L.date)} ${L.gaveUp?"❌":"✅"} (${L.wides} wide${L.wides===1?"":"s"})${linkBonus(L.found,L.t)?" 🌍":""} 🏏\n${SITE_URL}`,$("#lshare"));return}
   $("#lgive").onclick=()=>{L.done=true;L.gaveUp=true;L.msg="";saveLink();drawLink()};
   const ones=NET.players.map((p,i)=>i).filter(i=>NET.dist[i]===1||CLUBM.has(i));
   if(L.review!=null)$("#lreview").onclick=()=>{const c=L.review;L.review=null;const s=sharedSheet(c,L.t);
