@@ -686,7 +686,8 @@ const MAXG=6;
 /* Second run (from Mulldle #43): reshuffled order and first-class career clues instead of seasons together */
 const V2_FROM=43;
 const isV2=d=>dayNo(d)>=V2_FROM;
-const POOL2=(()=>{const pool=POOL.slice().sort((a,b)=>a-b);const r=mulberry(2027);
+/* Any number of games together, but not players who only shared a Trent Rockets XI with him */
+const POOL2=(()=>{const pool=MATES.filter(o=>!(o.fmt.length===1&&o.fmt[0]==="Hundred")).map(o=>o.p).sort((a,b)=>a-b);const r=mulberry(2027);
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}return pool})();
 function mulldleAnswer(d){const n=dayNo(d);
   if(isV2(d)){const k=n-V2_FROM;return POOL2[((k%POOL2.length)+POOL2.length)%POOL2.length]}
@@ -723,7 +724,7 @@ function renderMulldle(){
   const stats=store.get("mulldle_stats",{played:0,won:0,streak:0,max:0});
   $("#mulldle").innerHTML=`
    <div class="sec-head"><h2>Mulldle #${dayNo(d)}</h2><span class="qprog">${MAXG-today.g.length} guess${MAXG-today.g.length===1?"":"es"} left · new player at midnight (UK)</span></div>
-   ${v2?`<p class="note">Today's mystery player shared an XI with Mullaney between 2014 and 2023 (at least 10 games together). Guess any of his teammates and the clues compare their first-class careers and age. <b>Green</b> is a match, <b>yellow</b> is close (averages within 3, games within 15, age within 2 years), and ▲ ▼ show whether the answer is higher or lower.</p>`:
+   ${v2?`<p class="note">Today's mystery player played alongside Mullaney for Nottinghamshire between 2014 and 2023. Guess any of his teammates and the clues compare their first-class careers and age. <b>Green</b> is a match, <b>yellow</b> is close (averages within 3, games within 15, age within 2 years), and ▲ ▼ show whether the answer is higher or lower.</p>`:
    `<p class="note">Today's mystery player shared an XI with Mullaney between 2014 and 2023 (at least 10 games together). Guess any of his teammates and the clues tell you how close you are. <b>Green</b> is a match, <b>yellow</b> is close, and ▲ ▼ show whether the answer is higher or lower. For batting position, ▲ means the answer bats higher up the order.</p>`}
    ${over?"":`<div class="entry sugg-wrap"><input id="mguess" autocomplete="off" spellcheck="false" placeholder="Type a teammate's name…" aria-label="Guess a teammate"><ul class="sugg" id="msugg" hidden role="listbox"></ul></div><div class="flash" id="mflash"></div>`}
    <div class="tablewrap"><table class="mtable"><thead><tr><th style="text-align:left">Guess</th>${v2?"<th>Batting average</th><th>Bowling average</th><th>First-class games</th><th>Age</th>":"<th>First season together</th><th>Last season together</th><th>Games together</th><th>Usual position</th>"}</tr></thead>
